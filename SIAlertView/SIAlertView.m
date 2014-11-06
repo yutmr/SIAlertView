@@ -27,6 +27,12 @@ NSString *const SIAlertViewDidDismissNotification = @"SIAlertViewDidDismissNotif
 #define BUTTON_HEIGHT 44
 #define CONTAINER_WIDTH 300
 
+#ifdef NSFoundationVersionNumber_iOS_6_1
+    #define IOS7_SDK_AVAILABLE (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+#else
+    #define IOS7_SDK_AVAILABLE NO
+#endif
+
 const UIWindowLevel UIWindowLevelSIAlert = 1996.0;  // don't overlap system's alert
 const UIWindowLevel UIWindowLevelSIAlertBackground = 1985.0; // below the alert window
 
@@ -366,12 +372,13 @@ static SIAlertView *__si_alert_current_view;
     }
     
     self.oldKeyWindow = [[UIApplication sharedApplication] keyWindow];
-#ifdef __IPHONE_7_0
-    if ([self.oldKeyWindow respondsToSelector:@selector(setTintAdjustmentMode:)]) { // for iOS 7
-        self.oldTintAdjustmentMode = self.oldKeyWindow.tintAdjustmentMode;
-        self.oldKeyWindow.tintAdjustmentMode = UIViewTintAdjustmentModeDimmed;
+    
+    if (IOS7_SDK_AVAILABLE) {
+        if ([self.oldKeyWindow respondsToSelector:@selector(setTintAdjustmentMode:)]) { // for iOS 7
+            self.oldTintAdjustmentMode = self.oldKeyWindow.tintAdjustmentMode;
+            self.oldKeyWindow.tintAdjustmentMode = UIViewTintAdjustmentModeDimmed;
+        }
     }
-#endif
 
     if (![[SIAlertView sharedQueue] containsObject:self]) {
         [[SIAlertView sharedQueue] addObject:self];
@@ -420,7 +427,7 @@ static SIAlertView *__si_alert_current_view;
             self.didShowHandler(self);
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:SIAlertViewDidShowNotification object:self userInfo:nil];
-        #ifdef __IPHONE_7_0
+        #ifdef IOS7_SDK_AVAILABLE
         [self addParallaxEffect];
         #endif
         
@@ -447,9 +454,10 @@ static SIAlertView *__si_alert_current_view;
             self.willDismissHandler(self);
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:SIAlertViewWillDismissNotification object:self userInfo:nil];
-        #ifdef __IPHONE_7_0
-                [self removeParallaxEffect];
-        #endif
+        
+        if (IOS7_SDK_AVAILABLE) {
+            [self removeParallaxEffect];
+        }
     }
     
     void (^dismissComplete)(void) = ^{
@@ -511,16 +519,18 @@ static SIAlertView *__si_alert_current_view;
     }
     
     UIWindow *window = self.oldKeyWindow;
-#ifdef __IPHONE_7_0
-    if ([window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
-        window.tintAdjustmentMode = self.oldTintAdjustmentMode;
+    
+    if (IOS7_SDK_AVAILABLE) {
+        if ([window respondsToSelector:@selector(setTintAdjustmentMode:)]) {
+            window.tintAdjustmentMode = self.oldTintAdjustmentMode;
+        }
+    } else {
+        if (!window) {
+            window = [UIApplication sharedApplication].windows[0];
+        }
+        [window makeKeyWindow];
+        window.hidden = NO;
     }
-#endif
-    if (!window) {
-        window = [UIApplication sharedApplication].windows[0];
-    }
-    [window makeKeyWindow];
-    window.hidden = NO;
 }
 
 #pragma mark - Transitions
@@ -805,7 +815,7 @@ static SIAlertView *__si_alert_current_view;
 - (CGFloat)heightForTitleLabel
 {
     if (self.titleLabel) {
-        #ifdef __IPHONE_7_0
+        if (IOS7_SDK_AVAILABLE) {
             NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
             paragraphStyle.lineBreakMode = self.titleLabel.lineBreakMode;
             
@@ -819,7 +829,7 @@ static SIAlertView *__si_alert_current_view;
                                                           attributes:attributes
                                                              context:nil];
             return ceil(rect.size.height);
-        #else
+        } else {
             CGSize size = [self.title sizeWithFont:self.titleLabel.font
                                        minFontSize:
                                                     #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_6_0
@@ -831,7 +841,7 @@ static SIAlertView *__si_alert_current_view;
                                           forWidth:CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2
                                      lineBreakMode:self.titleLabel.lineBreakMode];
             return size.height;
-        #endif
+        }
     }
     
     return 0;
@@ -843,7 +853,10 @@ static SIAlertView *__si_alert_current_view;
     if (self.messageLabel) {
         CGFloat maxHeight = MESSAGE_MAX_LINE_COUNT * self.messageLabel.font.lineHeight;
         
-        #ifdef __IPHONE_7_0
+        if (IOS7_SDK_AVAILABLE) {
+            NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+            paragraphStyle.lineBreakMode = self.messageLabel.lineBreakMode;
+            
             NSDictionary *attributes = @{NSFontAttributeName:self.messageLabel.font};
             
             // NSString class method: boundingRectWithSize:options:attributes:context is
@@ -854,13 +867,13 @@ static SIAlertView *__si_alert_current_view;
                                                              context:nil];
             
             return MAX(minHeight, ceil(rect.size.height));
-        #else
+        } else {
             CGSize size = [self.message sizeWithFont:self.messageLabel.font
                                    constrainedToSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)
                                        lineBreakMode:self.messageLabel.lineBreakMode];
             
             return MAX(minHeight, size.height);
-        #endif
+        }
     }
     
     return minHeight;
