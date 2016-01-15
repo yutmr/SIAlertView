@@ -19,6 +19,7 @@ NSString *const SIAlertViewDidDismissNotification = @"SIAlertViewDidDismissNotif
 
 #define MESSAGE_MIN_LINE_COUNT 3
 #define MESSAGE_MAX_LINE_COUNT 5
+#define IMAGE_MAX_HEIGHT 200
 #define GAP 10
 #define CANCEL_BUTTON_PADDING_TOP 5
 #define CONTENT_PADDING_LEFT 10
@@ -47,6 +48,7 @@ static SIAlertView *__si_alert_current_view;
 
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *messageLabel;
+@property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) UIView *containerView;
 @property (nonatomic, strong) NSMutableArray *buttons;
 
@@ -344,6 +346,12 @@ static SIAlertView *__si_alert_current_view;
 - (void)setMessage:(NSString *)message
 {
 	_message = message;
+    [self invalidateLayout];
+}
+
+- (void)setImage:(UIImage *)image
+{
+    _image = image;
     [self invalidateLayout];
 }
 
@@ -737,6 +745,15 @@ static SIAlertView *__si_alert_current_view;
         self.messageLabel.frame = CGRectMake(CONTENT_PADDING_LEFT, y, self.containerView.bounds.size.width - CONTENT_PADDING_LEFT * 2, height);
         y += height;
     }
+    if (self.image) {
+        if (y > CONTENT_PADDING_TOP) {
+            y += GAP;
+        }
+        self.imageView.image = self.image;
+        CGFloat height = [self heightForImageView];
+        self.imageView.frame = CGRectMake(CONTENT_PADDING_LEFT, y, self.containerView.bounds.size.width - CONTENT_PADDING_LEFT * 2, height);
+        y += height;
+    }
     if (self.items.count > 0) {
         if (y > CONTENT_PADDING_TOP) {
             y += GAP;
@@ -775,6 +792,12 @@ static SIAlertView *__si_alert_current_view;
             height += GAP;
         }
         height += [self heightForMessageLabel];
+    }
+    if (self.image) {
+        if (height > CONTENT_PADDING_TOP) {
+            height += GAP;
+        }
+        height += [self heightForImageView];
     }
     if (self.items.count > 0) {
         if (height > CONTENT_PADDING_TOP) {
@@ -839,6 +862,16 @@ static SIAlertView *__si_alert_current_view;
     return minHeight;
 }
 
+- (CGFloat)heightForImageView
+{
+    if (! self.imageView) {
+        return 0;
+    }
+    CGFloat ratio = (self.image.size.height / self.image.size.width);
+    CGFloat height = (ratio * (CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2));
+    return MIN(ceil(height), IMAGE_MAX_HEIGHT);
+}
+
 #pragma mark - Setup
 
 - (void)setup
@@ -846,6 +879,7 @@ static SIAlertView *__si_alert_current_view;
     [self setupContainerView];
     [self updateTitleLabel];
     [self updateMessageLabel];
+    [self updateImageView];
     [self setupButtons];
     [self invalidateLayout];
 }
@@ -856,6 +890,7 @@ static SIAlertView *__si_alert_current_view;
     self.containerView = nil;
     self.titleLabel = nil;
     self.messageLabel = nil;
+    self.imageView = nil;
     [self.buttons removeAllObjects];
     [self.alertWindow removeFromSuperview];
     self.alertWindow = nil;
@@ -917,6 +952,23 @@ static SIAlertView *__si_alert_current_view;
     } else {
         [self.messageLabel removeFromSuperview];
         self.messageLabel = nil;
+    }
+    [self invalidateLayout];
+}
+
+- (void)updateImageView
+{
+    if (self.image) {
+        self.imageView = [[UIImageView alloc] init];
+        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+        // TODO: Set appearance
+        [self.containerView addSubview:self.imageView];
+#if DEBUG_LAYOUT
+        self.imageView.backgroundColor = [UIColor redColor];
+#endif
+    } else {
+        [self.imageView removeFromSuperview];
+        self.imageView = nil;
     }
     [self invalidateLayout];
 }
