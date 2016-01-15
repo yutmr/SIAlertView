@@ -249,19 +249,20 @@ static SIAlertView *__si_alert_current_view;
 
 - (id)init
 {
-	return [self initWithTitle:nil andMessage:nil];
+    return [self initWithTitle:nil message:nil image:nil];
 }
 
-- (id)initWithTitle:(NSString *)title andMessage:(NSString *)message
+- (id)initWithTitle:(NSString *)title message:(NSString *)message image:(UIImage *)image
 {
-	self = [super init];
-	if (self) {
-		_title = title;
+    self = [super init];
+    if (self) {
+        _title = title;
         _message = message;
+        _image = image;
         _enabledParallaxEffect = YES;
-		self.items = [[NSMutableArray alloc] init];
-	}
-	return self;
+        self.items = [[NSMutableArray alloc] init];
+    }
+    return self;
 }
 
 #pragma mark - Class methods
