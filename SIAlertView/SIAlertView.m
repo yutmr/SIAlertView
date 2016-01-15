@@ -254,6 +254,11 @@ static SIAlertView *__si_alert_current_view;
     return [self initWithTitle:nil message:nil image:nil];
 }
 
+- (id)initWithTitle:(NSString *)title andMessage:(NSString *)message
+{
+    return [self initWithTitle:title message:message image:nil];
+}
+
 - (id)initWithTitle:(NSString *)title message:(NSString *)message image:(UIImage *)image
 {
     self = [super init];
