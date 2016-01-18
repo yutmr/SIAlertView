@@ -45,7 +45,7 @@
 
 - (IBAction)alert1:(id)sender
 {
-    SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:@"Title1" andMessage:@"Count down"];
+    SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:@"Title1" message:@"Count down" image:nil];
     [alertView addButtonWithTitle:@"Button1"
                              type:SIAlertViewButtonTypeDefault
                           handler:^(SIAlertView *alertView) {
@@ -106,7 +106,7 @@
 
 - (IBAction)alert2:(id)sender
 {
-    SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:@"Title2" andMessage:@"Message2"];
+    SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:@"Title2" message:@"Message2" image:[UIImage imageNamed:@"portrait"]];
     [alertView addButtonWithTitle:@"Cancel"
                              type:SIAlertViewButtonTypeCancel
                           handler:^(SIAlertView *alertView) {
@@ -145,7 +145,7 @@ id observer1,observer2,observer3,observer4;
 
 - (IBAction)alert3:(id)sender
 {
-    SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:nil andMessage:@"Message3"];
+    SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:nil message:@"Message3" image:[UIImage imageNamed:@"landscape"]];
     [alertView addButtonWithTitle:@"Cancel"
                              type:SIAlertViewButtonTypeCancel
                           handler:^(SIAlertView *alertView) {
