@@ -17,8 +17,9 @@ NSString *const SIAlertViewDidDismissNotification = @"SIAlertViewDidDismissNotif
 
 #define DEBUG_LAYOUT 0
 
+#define TITLE_MAX_LINE_COUNT 3
 #define MESSAGE_MIN_LINE_COUNT 3
-#define MESSAGE_MAX_LINE_COUNT 5
+#define MESSAGE_MAX_LINE_COUNT 20
 #define IMAGE_MAX_HEIGHT 200
 #define GAP 10
 #define CANCEL_BUTTON_PADDING_TOP 5
@@ -856,12 +857,12 @@ static SIAlertView *__si_alert_current_view;
         
         // NSString class method: boundingRectWithSize:options:attributes:context is
         // available only on ios7.0 sdk.
-        CGRect rect = [self.titleLabel.text boundingRectWithSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)
+        CGRect rect = [self.messageLabel.text boundingRectWithSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)
                                                          options:NSStringDrawingUsesLineFragmentOrigin
                                                       attributes:attributes
                                                          context:nil];
         
-        return MAX(minHeight, ceil(rect.size.height));
+        return ceil(MAX(minHeight, rect.size.height));
     }
     
     return minHeight;
@@ -924,6 +925,7 @@ static SIAlertView *__si_alert_current_view;
             self.titleLabel.textColor = self.titleColor;
             self.titleLabel.adjustsFontSizeToFitWidth = YES;
             self.titleLabel.minimumScaleFactor = 0.75;
+            self.titleLabel.numberOfLines = TITLE_MAX_LINE_COUNT;
 
             [self.containerView addSubview:self.titleLabel];
 #if DEBUG_LAYOUT
