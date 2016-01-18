@@ -17,6 +17,7 @@ NSString *const SIAlertViewDidDismissNotification = @"SIAlertViewDidDismissNotif
 
 #define DEBUG_LAYOUT 0
 
+#define TITLE_MAX_LINE_COUNT 3
 #define MESSAGE_MIN_LINE_COUNT 3
 #define MESSAGE_MAX_LINE_COUNT 5
 #define IMAGE_MAX_HEIGHT 200
@@ -924,6 +925,7 @@ static SIAlertView *__si_alert_current_view;
             self.titleLabel.textColor = self.titleColor;
             self.titleLabel.adjustsFontSizeToFitWidth = YES;
             self.titleLabel.minimumScaleFactor = 0.75;
+            self.titleLabel.numberOfLines = TITLE_MAX_LINE_COUNT;
 
             [self.containerView addSubview:self.titleLabel];
 #if DEBUG_LAYOUT
