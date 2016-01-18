@@ -861,7 +861,7 @@ static SIAlertView *__si_alert_current_view;
                                                       attributes:attributes
                                                          context:nil];
         
-        return MAX(minHeight, ceil(rect.size.height));
+        return ceil(MAX(minHeight, rect.size.height));
     }
     
     return minHeight;
