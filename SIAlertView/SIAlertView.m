@@ -824,48 +824,24 @@ static SIAlertView *__si_alert_current_view;
 
 - (CGFloat)heightForTitleLabel
 {
-    if (self.titleLabel) {
-        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-        paragraphStyle.lineBreakMode = self.titleLabel.lineBreakMode;
-        
-        NSDictionary *attributes = @{NSFontAttributeName:self.titleLabel.font,
-                                     NSParagraphStyleAttributeName: paragraphStyle.copy};
-        
-        // NSString class method: boundingRectWithSize:options:attributes:context is
-        // available only on ios7.0 sdk.
-        CGRect rect = [self.titleLabel.text boundingRectWithSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, CGFLOAT_MAX)
-                                                         options:NSStringDrawingUsesLineFragmentOrigin
-                                                      attributes:attributes
-                                                         context:nil];
-        return ceil(rect.size.height);
+    if (! self.titleLabel) {
+        return 0;
     }
     
-    return 0;
+    CGSize size = [self.titleLabel sizeThatFits:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, CGFLOAT_MAX)];
+    return ceil(size.height);
 }
 
 - (CGFloat)heightForMessageLabel
 {
-    CGFloat minHeight = MESSAGE_MIN_LINE_COUNT * self.messageLabel.font.lineHeight;
-    if (self.messageLabel) {
-        CGFloat maxHeight = MESSAGE_MAX_LINE_COUNT * self.messageLabel.font.lineHeight;
-        
-        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-        paragraphStyle.lineBreakMode = self.messageLabel.lineBreakMode;
-        
-        NSDictionary *attributes = @{NSFontAttributeName:self.messageLabel.font,
-                                     NSParagraphStyleAttributeName: paragraphStyle.copy};
-        
-        // NSString class method: boundingRectWithSize:options:attributes:context is
-        // available only on ios7.0 sdk.
-        CGRect rect = [self.messageLabel.text boundingRectWithSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)
-                                                         options:NSStringDrawingUsesLineFragmentOrigin
-                                                      attributes:attributes
-                                                         context:nil];
-        
-        return ceil(MAX(minHeight, rect.size.height));
+    if (! self.messageLabel) {
+        return 0;
     }
-    
-    return minHeight;
+
+    CGFloat minHeight = MESSAGE_MIN_LINE_COUNT * self.messageLabel.font.lineHeight;
+    CGFloat maxHeight = MESSAGE_MAX_LINE_COUNT * self.messageLabel.font.lineHeight;
+    CGSize size = [self.messageLabel sizeThatFits:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)];
+    return ceil(MAX(minHeight, size.height));
 }
 
 - (CGFloat)heightForImageView
